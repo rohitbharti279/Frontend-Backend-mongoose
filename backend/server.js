@@ -21,19 +21,19 @@ const dataFromMongodb = mongoose.model('datas',dataSchema);
 
 // console.log("testing running");
 
-// const SaveInDb = async () => {
-//     const data = new dataFromMongodb({ name: "rohit", age: 22, email: "rohit@gmail.com"});
-//     const result = await data.save();
-//     console.log(result);
+const SaveInDb = async () => {
+    const data = new dataFromMongodb({ name: "rohit", age: 22, email: "rohit@gmail.com"});
+    const result = await data.save();
+    console.log(result);
 
-// }
-// SaveInDb();
+}
+SaveInDb();
 
-// const findInDb = async () => {
-//     const data = await dataFromMongodb.find({ name: "rony" }); // find particular data by .........
-//     console.log(data);
-// }
-// findInDb();
+const findInDb = async () => {
+    const data = await dataFromMongodb.find({ name: "rony" }); // find particular data by .........
+    console.log(data);
+}
+findInDb();
 
 
 
