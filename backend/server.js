@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 
 mongoose.connect('mongodb://127.0.0.1:27017/web-quiz');
 
+
+ 
+
 // apply condition
 const dataSchema = new mongoose.Schema({
   name: String,
