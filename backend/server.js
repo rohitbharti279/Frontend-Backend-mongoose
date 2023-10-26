@@ -90,7 +90,7 @@ app.listen(PORT, () => {
 
 
 
-// image save in uploads file with in computers
+// image save in uploads file with in computers memory folder
 // const express = require('express');
 // const bodyParser = require('body-parser');
 // const mongoose = require('mongoose');
