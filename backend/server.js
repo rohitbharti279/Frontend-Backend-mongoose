@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -58,10 +59,21 @@ app.get('/api/getData', (req, res) => {
 //image uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-//delete data
+//delete data from mongodb and upload file
 app.delete('/api/deleteData/:id', async (req, res) => {
   try {
     const id = req.params.id;
+
+    const dataToDelete = await Data.findById(id);
+    if (!dataToDelete) {
+      return res.status(404).send('Data not found');
+    }
+
+    // Delete associated image file
+    if (dataToDelete.image) {
+      fs.unlinkSync(`./uploads/${dataToDelete.image}`);
+    }
+
     await Data.findByIdAndDelete(id);
     res.status(200).send('Data deleted successfully');
   } catch (err) {
