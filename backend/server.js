@@ -26,7 +26,7 @@ const Data = mongoose.model('Data', dataSchema);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads');
+    cb(null, './uploads'); //cb=call back
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname);
@@ -55,7 +55,20 @@ app.get('/api/getData', (req, res) => {
     .catch(err => res.status(500).send(err));
 });
 
+//image uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+//delete data
+app.delete('/api/deleteData/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Data.findByIdAndDelete(id);
+    res.status(200).send('Data deleted successfully');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
