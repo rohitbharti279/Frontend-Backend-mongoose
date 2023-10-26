@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -8,64 +10,53 @@ const PORT = process.env.PORT || 3001;
 const cors = require('cors');
 app.use(cors());
 
-// handle incoming data from HTML
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 mongoose.connect('mongodb://127.0.0.1:27017/web-quiz');
 
-
- 
-
-// apply condition
 const dataSchema = new mongoose.Schema({
   name: String,
   age: Number,
-  email: String
+  email: String,
+  image: String // Added a field for image filename
 });
 
 const Data = mongoose.model('Data', dataSchema);
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
 
-// const SaveInDb = async () => {
-//     const data = new Data({ name: "test1", age: 11, email: "test1@gmail.com"});
-//     const result = await data.save();
-//     console.log(result);
+const upload = multer({ storage: storage });
 
-// }
-// SaveInDb();
+app.post('/api/saveData', upload.single('image'), async (req, res) => {
+  try {
+    const { name, age, email } = req.body;
+    const newImage = req.file ? req.file.filename : null;
 
-// const findInDb = async () => {
-//     const data = await Data.find({ name: "rony" }); // find particular data by .........
-//     console.log(data);
-// }
-// findInDb();
+    const newData = new Data({ name, age, email, image: newImage });
 
-
-
-
-app.post('/api/saveData', async (req, res) => {
-    try {
-      const { name, age, email } = req.body;
-      const newData = new Data({ name, age, email });
-      await newData.save();
-      res.status(200).send('Data saved successfully');
-    } catch (err) {
-      res.status(500).send(err.message);
-    }
-  });
-  
+    await newData.save();
+    res.status(200).send('Data saved successfully');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 app.get('/api/getData', (req, res) => {
-    Data.find({})
-      .then(data => res.status(200).send(data))
-      .catch(err => res.status(500).send(err));
-  });
-  
+  Data.find({})
+    .then(data => res.status(200).send(data))
+    .catch(err => res.status(500).send(err));
+});
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
-
